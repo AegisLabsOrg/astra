@@ -1,0 +1,19 @@
+targets:
+  $default:
+    builders:
+      astra|controller_builder:
+        enabled: true
+        generate_for:
+          - test/**
+          - bin/**
+          - lib/**
+          - example/**
+
+builders:
+  controller_builder:
+    import: "package:astra/builder.dart"
+    builder_factories: ["controllerBuilder"]
+    build_extensions: {".dart": [".astra_controller.g.part"]}
+    auto_apply: dependents
+    build_to: cache
+    applies_builders: ["source_gen:combining_builder"]
