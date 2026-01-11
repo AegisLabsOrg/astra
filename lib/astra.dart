@@ -16,6 +16,9 @@ export 'src/openapi/registry.dart';
 export 'src/modules/auth.dart';
 export 'src/modules/logger.dart';
 export 'src/modules/persistence.dart';
+// WebSocket support
+export 'package:shelf_web_socket/shelf_web_socket.dart';
+export 'package:web_socket_channel/web_socket_channel.dart';
 
 // Meta (Annotations)
 export 'src/meta/annotations.dart';

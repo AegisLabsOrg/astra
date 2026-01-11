@@ -8,6 +8,10 @@ targets:
           - bin/**
           - lib/**
           - example/**
+      astra|client_builder:
+        enabled: true
+        generate_for:
+          - example/**
 
 builders:
   controller_builder:
@@ -17,3 +21,10 @@ builders:
     auto_apply: dependents
     build_to: cache
     applies_builders: ["source_gen:combining_builder"]
+  
+  client_builder:
+    import: "package:astra/builder.dart"
+    builder_factories: ["clientBuilder"]
+    build_extensions: {".dart": [".client.dart"]}
+    auto_apply: dependents
+    build_to: source

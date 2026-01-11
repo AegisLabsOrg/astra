@@ -29,6 +29,11 @@ class Patch extends HttpMethodAnnotation {
   const Patch(String path) : super(path);
 }
 
+/// Annotation for WebSocket routes
+class WebSocketRoute extends HttpMethodAnnotation {
+  const WebSocketRoute(String path) : super(path);
+}
+
 /// Annotation for Controllers
 class Controller {
   final String path;

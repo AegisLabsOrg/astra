@@ -40,11 +40,16 @@ class ControllerGenerator extends GeneratorForAnnotation<Controller> {
         );
 
         String? httpMethod;
+        bool isWebSocket = false;
         if (typeName == 'Get') httpMethod = 'HttpMethod.get';
         if (typeName == 'Post') httpMethod = 'HttpMethod.post';
         if (typeName == 'Put') httpMethod = 'HttpMethod.put';
         if (typeName == 'Delete') httpMethod = 'HttpMethod.delete';
         if (typeName == 'Patch') httpMethod = 'HttpMethod.patch';
+        if (typeName == 'WebSocketRoute') {
+          httpMethod = 'HttpMethod.get';
+          isWebSocket = true;
+        }
 
         if (httpMethod != null) {
           final reader = ConstantReader(computed);
@@ -88,7 +93,12 @@ class ControllerGenerator extends GeneratorForAnnotation<Controller> {
             }
           }
 
-          final openApiMethodStr = typeName!.toUpperCase();
+          String openApiMethodStr;
+          if (isWebSocket) {
+            openApiMethodStr = 'GET';
+          } else {
+            openApiMethodStr = typeName!.toUpperCase();
+          }
           buffer.writeln("    openApi.registerRoute(");
           buffer.writeln("      '$openApiMethodStr',");
           buffer.writeln("      '$fullPath',");
@@ -109,6 +119,12 @@ class ControllerGenerator extends GeneratorForAnnotation<Controller> {
           buffer.writeln(
             "    router.register($httpMethod, '$fullPath', (Request req, Map<String, String> pathParams) async {",
           );
+
+          if (isWebSocket) {
+            buffer.writeln(
+              "      final wsHandler = webSocketHandler((WebSocketChannel wsChannel, String? protocol) {",
+            );
+          }
 
           final params = method.formalParameters;
           final argList = <String>[];
@@ -140,22 +156,26 @@ class ControllerGenerator extends GeneratorForAnnotation<Controller> {
             if (extractedArg == null) {
               final bodyAnno = _getAnnotation(param, 'Body');
               if (bodyAnno != null) {
-                final typeName = param.type.getDisplayString(
-                  withNullability: false,
-                );
+                if (isWebSocket) {
+                  extractedArg =
+                      "throw UnimplementedError('Body not supported in WebSocketRoute')";
+                } else {
+                  final typeName = param.type.getDisplayString(
+                    withNullability: false,
+                  );
 
-                // We define a block variable name based on param name
-                buffer.writeln(
-                  "      final bodyBytes_${param.name} = await req.readAsString();",
-                );
-                buffer.writeln(
-                  "      final bodyJson_${param.name} = jsonDecode(bodyBytes_${param.name});",
-                );
-                buffer.writeln(
-                  "      final ${param.name}Arg = $typeName.fromJson(bodyJson_${param.name});",
-                );
+                  buffer.writeln(
+                    "      final bodyBytes_${param.name} = await req.readAsString();",
+                  );
+                  buffer.writeln(
+                    "      final bodyJson_${param.name} = jsonDecode(bodyBytes_${param.name});",
+                  );
+                  buffer.writeln(
+                    "      final ${param.name}Arg = $typeName.fromJson(bodyJson_${param.name});",
+                  );
 
-                extractedArg = "${param.name}Arg";
+                  extractedArg = "${param.name}Arg";
+                }
               }
             }
 
@@ -165,9 +185,13 @@ class ControllerGenerator extends GeneratorForAnnotation<Controller> {
               if (type == 'Request') {
                 extractedArg = 'req';
               }
+              // 5. Special Types: WebSocketChannel
+              if (type == 'WebSocketChannel') {
+                extractedArg = 'wsChannel';
+              }
             }
 
-            // 4. Fallback / TODO: Body & DI
+            // 6. Fallback / TODO: Body & DI
             if (extractedArg == null) {
               extractedArg =
                   "throw UnimplementedError('Cannot resolve parameter ${param.name}')";
@@ -176,28 +200,35 @@ class ControllerGenerator extends GeneratorForAnnotation<Controller> {
             argList.add(extractedArg);
           }
 
-          // Smart Return Values logic
-          final returnType = method.returnType.getDisplayString(
-            withNullability: false,
-          );
-
-          if (returnType == 'void' || returnType == 'Future<void>') {
-            buffer.writeln(
-              "      await this.${method.name}(${argList.join(', ')});",
-            );
-            buffer.writeln("      return Response.ok(null);");
+          if (isWebSocket) {
+            buffer.writeln("      this.${method.name}(${argList.join(', ')});");
+            buffer.writeln("      });");
+            buffer.writeln("      return wsHandler(req);");
           } else {
-            buffer.writeln(
-              "      final result = await this.${method.name}(${argList.join(', ')});",
+            // Smart Return Values logic
+            final returnType = method.returnType.getDisplayString(
+              withNullability: false,
             );
 
-            if (returnType == 'Response' || returnType == 'Future<Response>') {
-              buffer.writeln("      return result;");
-            } else {
-              // Assume JSON serialization for any other type
+            if (returnType == 'void' || returnType == 'Future<void>') {
               buffer.writeln(
-                "      return Response.ok(jsonEncode(result), headers: {'content-type': 'application/json'});",
+                "      await this.${method.name}(${argList.join(', ')});",
               );
+              buffer.writeln("      return Response.ok(null);");
+            } else {
+              buffer.writeln(
+                "      final result = await this.${method.name}(${argList.join(', ')});",
+              );
+
+              if (returnType == 'Response' ||
+                  returnType == 'Future<Response>') {
+                buffer.writeln("      return result;");
+              } else {
+                // Assume JSON serialization for any other type
+                buffer.writeln(
+                  "      return Response.ok(jsonEncode(result), headers: {'content-type': 'application/json'});",
+                );
+              }
             }
           }
 
