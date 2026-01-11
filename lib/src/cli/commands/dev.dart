@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:watcher/watcher.dart';
+import 'package:mason_logger/mason_logger.dart';
 
 class DevCommand extends Command {
   @override
@@ -9,6 +10,8 @@ class DevCommand extends Command {
 
   @override
   final String description = 'Starts the development server with hot reload.';
+
+  final Logger _logger = Logger();
 
   Process? _process;
   StreamSubscription? _subscription;
@@ -28,14 +31,14 @@ class DevCommand extends Command {
     final target = argResults?['target'] as String;
 
     if (!File(target).existsSync()) {
-      print('❌ Target file not found: $target');
-      print('   Please create $target or specify a file with --target');
+      _logger.err('Target file not found: $target');
+      _logger.detail('Please create $target or specify a file with --target');
       return;
     }
 
-    print('🔧 Starting Astra development server...');
-    print('   Target: $target');
-    print('   Watching: lib/**, bin/**');
+    _logger.info(backgroundBlue.wrap(white.wrap(' Astra Dev Server '))!);
+    _logger.info(styleBold.wrap('Target: ')! + target);
+    _logger.info(styleDim.wrap('Watching: lib/**, bin/**'));
 
     await _startServer(target);
     _watch(target);
@@ -54,7 +57,7 @@ class DevCommand extends Command {
       _process!.kill();
     }
 
-    print('🚀 (Re)starting server...');
+    _logger.info(lightCyan.wrap('🚀 (Re)starting server...'));
     try {
       _process = await Process.start('dart', [
         'run',
@@ -63,14 +66,14 @@ class DevCommand extends Command {
 
       // We don't await exit code here because the server is long-running
     } catch (e) {
-      print('❌ Failed to start server: $e');
+      _logger.err('Failed to start server: $e');
     }
   }
 
   void _stopServer() {
     _process?.kill();
     _subscription?.cancel();
-    print('\n👋 Server stopped.');
+    _logger.info('\n👋 Server stopped.');
   }
 
   void _watch(String target) {
@@ -86,7 +89,7 @@ class DevCommand extends Command {
       // Simple debounce
       await Future.delayed(Duration(milliseconds: 200));
 
-      print('🔄 Change detected: ${event.path}');
+      _logger.info(darkGray.wrap('🔄 Change detected: ${event.path}'));
       await _startServer(target);
       _isReloading = false;
     });

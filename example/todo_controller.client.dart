@@ -8,6 +8,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'database.dart';
+import 'models.dart';
 import 'todo_controller.dart';
 
 class TodoControllerClient {

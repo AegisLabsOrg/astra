@@ -29,19 +29,19 @@ class PostgresConnection implements DatabaseConnection {
     // Simulation / Pseudo-code for v3.0
     // final endpoint = Endpoint(host: host, port: port, database: database, username: username, password: password);
     // _connection = await Connection.open(endpoint);
-    print('📦 Connected to PostgreSQL: $host:$port/$database');
+    // print('📦 Connected to PostgreSQL: $host:$port/$database');
   }
 
   @override
   Future<void> disconnect() async {
     // await _connection?.close();
-    print('📦 Disconnected from PostgreSQL');
+    // print('📦 Disconnected from PostgreSQL');
   }
 
   @override
   Future<T> transaction<T>(Future<T> Function(dynamic txn) action) async {
     // return _connection.runTx((session) => action(session));
-    print('📦 Running Transaction');
+    // print('📦 Running Transaction');
     return action('mock_transaction_session');
   }
 

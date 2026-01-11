@@ -5,6 +5,7 @@ import 'package:shelf/shelf_io.dart' as io;
 import 'package:astra/src/routing/router.dart';
 import 'package:astra/src/routing/route.dart';
 import 'package:astra/src/di/container.dart';
+import 'package:astra/src/modules/logger.dart';
 import 'exceptions.dart';
 import 'package:astra/src/openapi/registry.dart';
 import 'package:astra/src/openapi/models.dart';
@@ -135,9 +136,16 @@ class AstraApp {
   /// Starts the HTTP server.
   Future<HttpServer> listen(int port, {String address = '0.0.0.0'}) async {
     final server = await io.serve(_handler, address, port);
-    print(
-      '🚀 Astra server running on http://${server.address.host}:${server.port}',
-    );
+    try {
+      final logger = container.resolve<AstraLogger>();
+      logger.info(
+        '🚀 Astra server running on http://${server.address.host}:${server.port}',
+      );
+    } catch (_) {
+      print(
+        '🚀 Astra server running on http://${server.address.host}:${server.port}',
+      );
+    }
     return server;
   }
 }

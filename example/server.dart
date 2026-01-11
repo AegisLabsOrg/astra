@@ -22,6 +22,6 @@ void main() async {
 
   // 4. 启动服务
   await app.listen(3000);
-  print('✨ Todo App running on http://localhost:3000');
-  print('📚 Documentation: http://localhost:3000/docs');
+  logger.info('✨ Todo App running on http://localhost:3000');
+  logger.info('📚 Documentation: http://localhost:3000/docs');
 }

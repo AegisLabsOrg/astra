@@ -1,7 +1,10 @@
 import 'package:args/command_runner.dart';
 import 'package:astra/src/cli/commands/dev.dart';
+import 'package:mason_logger/mason_logger.dart';
 
 class AstraRunner extends CommandRunner<void> {
+  final Logger _logger = Logger();
+
   AstraRunner() : super('astra', 'Astra Framework CLI Tool') {
     addCommand(DevCommand());
   }
@@ -11,10 +14,11 @@ class AstraRunner extends CommandRunner<void> {
     try {
       return await super.run(args);
     } on UsageException catch (e) {
-      print(e);
+      _logger.err(e.message);
+      _logger.info(e.usage);
       // exit(64); // Exit code for usage error
     } catch (e) {
-      print('An error occurred: $e');
+      _logger.err('An error occurred: $e');
     }
   }
 }
