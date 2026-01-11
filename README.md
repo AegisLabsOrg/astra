@@ -3,6 +3,8 @@
 Astra 是一个受 **FastAPI** 启发的现代 Dart Web 框架。
 它利用 Dart 的 **AOT 编译**性能和强类型系统，提供极佳的开发者体验 (DX)。
 
+[English Documentation](README_EN.md)
+
 ## ✨ 核心特性
 
 - **直观的路由定义**：使用 `@Get`, `@Post` 等注解定义路由，类似 FastAPI/NestJS。
