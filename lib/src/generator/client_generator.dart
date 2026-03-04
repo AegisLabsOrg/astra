@@ -1,5 +1,4 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
@@ -64,9 +63,7 @@ class ClientGenerator extends GeneratorForAnnotation<Controller> {
         final computed = metadata.computeConstantValue();
         if (computed == null) continue;
 
-        final typeName = computed.type?.getDisplayString(
-          withNullability: false,
-        );
+        final typeName = computed.type?.getDisplayString();
 
         String? httpMethod;
         bool isWebSocket = false;
@@ -95,7 +92,7 @@ class ClientGenerator extends GeneratorForAnnotation<Controller> {
 
           for (final param in method.formalParameters) {
             final pName = param.name;
-            final pType = param.type.getDisplayString(withNullability: false);
+            final pType = param.type.getDisplayString();
 
             // Check annotations
             final pathAnno = _getAnnotation(param, 'Path');
@@ -195,9 +192,9 @@ class ClientGenerator extends GeneratorForAnnotation<Controller> {
           buffer.writeln("    }");
 
           if (innerReturnType != 'void') {
-            if (innerReturnType == 'int')
+            if (innerReturnType == 'int') {
               buffer.writeln("    return int.parse(response.body);");
-            else if (innerReturnType == 'double')
+            } else if (innerReturnType == 'double')
               buffer.writeln("    return double.parse(response.body);");
             else if (innerReturnType == 'String')
               buffer.writeln("    return response.body;");
@@ -238,7 +235,7 @@ class ClientGenerator extends GeneratorForAnnotation<Controller> {
   ) {
     for (final meta in param.metadata.annotations) {
       final obj = meta.computeConstantValue();
-      final type = obj?.type?.getDisplayString(withNullability: false);
+      final type = obj?.type?.getDisplayString();
       if (type == annotationName) {
         return obj;
       }

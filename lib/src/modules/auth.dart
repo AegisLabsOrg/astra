@@ -19,9 +19,29 @@ abstract class AuthService {
 /// Middleware that protects routes
 /// Adds 'user' to context if valid.
 /// Returns 401 if [optional] is false and token is missing/invalid.
-Middleware authMiddleware(AuthService authService, {bool optional = false}) {
+/// [whitelist] is a list of paths that should be excluded from auth checks (e.g. ['/login', '/docs']).
+Middleware authMiddleware(
+  AuthService authService, {
+  bool optional = false,
+  List<String> whitelist = const [],
+}) {
   return (Handler innerHandler) {
     return (Request request) async {
+      // 0. Check Whitelist
+      // Simple logic: if path starts with any whitelist item
+      // Note: request.url.path does not contain the leading slash in Shelf for some setups,
+      // but usually we check relative to mount.
+      // Let's normalize by adding '/' if missing for comparison
+      final path = request.url.path.startsWith('/')
+          ? request.url.path
+          : '/${request.url.path}';
+
+      for (final allowed in whitelist) {
+        if (path == allowed || path.startsWith('$allowed/')) {
+          return await innerHandler(request);
+        }
+      }
+
       final authHeader = request.headers['Authorization'];
       String? token;
 

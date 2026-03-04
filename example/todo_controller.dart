@@ -1,7 +1,6 @@
-import 'package:astra/astra.dart';
-import 'package:astra/src/routing/route.dart';
+import 'package:astra_dart/astra.dart';
+import 'package:astra_dart/src/routing/route.dart';
 import 'package:drift/drift.dart' hide Query;
-import 'package:shelf/shelf.dart';
 import 'database.dart'; // Import Database
 import 'models.dart';
 import 'dart:convert';

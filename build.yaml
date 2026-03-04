@@ -1,21 +1,21 @@
 targets:
   $default:
     builders:
-      astra|controller_builder:
+      astra_dart|controller_builder:
         enabled: true
         generate_for:
           - test/**
           - bin/**
           - lib/**
           - example/**
-      astra|client_builder:
+      astra_dart|client_builder:
         enabled: true
         generate_for:
           - example/**
 
 builders:
   controller_builder:
-    import: "package:astra/builder.dart"
+    import: "package:astra_dart/builder.dart"
     builder_factories: ["controllerBuilder"]
     build_extensions: {".dart": [".astra_controller.g.part"]}
     auto_apply: dependents
@@ -23,7 +23,7 @@ builders:
     applies_builders: ["source_gen:combining_builder"]
   
   client_builder:
-    import: "package:astra/builder.dart"
+    import: "package:astra_dart/builder.dart"
     builder_factories: ["clientBuilder"]
     build_extensions: {".dart": [".client.dart"]}
     auto_apply: dependents

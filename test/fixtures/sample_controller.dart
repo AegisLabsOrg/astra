@@ -1,7 +1,5 @@
-import 'package:astra/astra.dart';
-import 'package:astra/src/routing/route.dart';
-import 'package:astra/src/routing/router.dart';
-import 'package:shelf/shelf.dart';
+import 'package:astra_dart/astra.dart';
+import 'package:astra_dart/src/routing/route.dart';
 import 'dart:convert';
 
 part 'sample_controller.g.dart';

@@ -1,8 +1,7 @@
-import 'package:astra/astra.dart';
-import 'package:shelf/shelf.dart';
+import 'package:astra_dart/astra.dart';
 import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
-import 'package:shelf/shelf.dart'; // Add this import
+// Add this import
 
 void main() {
   group('AstraApp Integration Tests', () {
@@ -12,7 +11,7 @@ void main() {
     setUp(() async {
       app = AstraApp();
       // Manually register a route for testing
-      app.get('/hello', (Request req) {
+      app.get('/hello', (Request req, Map<String, String> params) {
         return Response.ok('Astra is running! Request to: hello');
       });
       // Start the server in the background

@@ -10,7 +10,7 @@
 ## 架构准则
 
 ### 1. 路由与处理 (Routing & Handling)
-- 使用 **注解 (Annotations/Macros)** 定义路由，类似 FastAPI 的装饰器。
+- 使用 **注解 (Annotations)** 定义路由，类似 FastAPI 的装饰器。
   - 示例：`@Get('/users')`，`@Post('/users')`。
 - Handler 应返回类型化的对象、`Response` 对象或 `Future<T>`。
 - 支持通过参数名或类型自动注入路径参数 (Path Params) 和查询参数 (Query Params)。
@@ -18,8 +18,8 @@
 ### 2. 数据验证与序列化
 - 输入数据 (JSON Body) 应自动解析为 Dart 类 (DTOs)。
 - 区分请求 (Request) 和响应 (Response) 的 DTO 模型。
-- **核心技术**：强制使用 **Dart Macros (Dart 3.10+)** 进行序列化和路由元数据处理。
-  - **优势**：零运行时开销 (对 AOT 友好)，无需 `build_runner` 或文件监听器。实现“写完即跑”的体验。
+- **核心技术**：使用 **build_runner (代码生成)** 进行序列化和路由元数据处理。
+  - **优势**：零运行时开销 (对 AOT 友好)，类型安全。实现“写完即跑”的体验。
 
 ### 3. 依赖注入 (Dependency Injection)
 - 实现分层依赖注入系统，不仅支持单例，也要支持请求级作用域 (Scoped)。
@@ -39,4 +39,4 @@
 ## 用户画像
 用户是一位拥有 11 年经验的高级工程师，Flutter 专家。
 - **不要**解释基础的 Dart 语法。
-- **重点关注**架构决策、高级设计模式和元编程 (Macros) 的实现细节。
+- **重点关注**架构决策、高级设计模式和元编程 (代码生成) 的实现细节。

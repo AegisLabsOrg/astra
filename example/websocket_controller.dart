@@ -1,8 +1,5 @@
-import 'package:astra/astra.dart';
-import 'package:astra/src/routing/route.dart';
-import 'package:shelf/shelf.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:web_socket_channel/status.dart' as status;
+import 'package:astra_dart/astra.dart';
+import 'package:astra_dart/src/routing/route.dart';
 
 part 'websocket_controller.g.dart';
 

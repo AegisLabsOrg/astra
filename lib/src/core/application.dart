@@ -2,13 +2,12 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
-import 'package:astra/src/routing/router.dart';
-import 'package:astra/src/routing/route.dart';
-import 'package:astra/src/di/container.dart';
-import 'package:astra/src/modules/logger.dart';
+import 'package:astra_dart/src/routing/router.dart';
+import 'package:astra_dart/src/routing/route.dart';
+import 'package:astra_dart/src/di/container.dart';
+import 'package:astra_dart/src/modules/logger.dart';
 import 'exceptions.dart';
-import 'package:astra/src/openapi/registry.dart';
-import 'package:astra/src/openapi/models.dart';
+import 'package:astra_dart/src/openapi/registry.dart';
 
 /// The main entry point for an Astra application.
 class AstraApp {
@@ -54,8 +53,23 @@ class AstraApp {
   void _init() {
     _registerBuiltInRoutes();
 
-    // Basic handler
-    var pipeline = Pipeline().addMiddleware(logRequests());
+    // Create DI scope middleware
+    Middleware diScopeMiddleware() {
+      return (Handler innerHandler) {
+        return (Request request) {
+          final scope = container.createScope();
+          final context = Map<String, Object>.from(request.context);
+          context['astra.container'] = scope;
+          return innerHandler(request.change(context: context));
+        };
+      };
+    }
+
+    // Basic handler pipeline
+    // Order matters: scope must be available for subsequent middlewares/handlers.
+    var pipeline = Pipeline()
+        .addMiddleware(diScopeMiddleware())
+        .addMiddleware(logRequests());
 
     // Add custom middlewares
     for (final m in middlewares) {
@@ -74,12 +88,41 @@ class AstraApp {
       );
     });
 
+    // Swagger UI (Default Fast API style)
     router.register(HttpMethod.get, '/docs', (req, params) {
+      const html = '''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Astra Swagger UI</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui.css" />
+</head>
+<body>
+<div id="swagger-ui"></div>
+<script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-bundle.js" crossorigin></script>
+<script>
+  window.onload = () => {
+    window.ui = SwaggerUIBundle({
+      url: '/openapi.json',
+      dom_id: '#swagger-ui',
+    });
+  };
+</script>
+</body>
+</html>
+''';
+      return Response.ok(html, headers: {'content-type': 'text/html'});
+    });
+
+    // ReDoc
+    router.register(HttpMethod.get, '/redoc', (req, params) {
       const html = '''
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Astra API Docs</title>
+    <title>Astra ReDoc</title>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
@@ -111,9 +154,6 @@ class AstraApp {
 
     try {
       // Pass both request and path params to the handler
-      // The generated code must accept (Request request, Map<String, String> pathParams)
-      // or handle the dynamic call accordingly.
-      // For generated handlers, we will align them to take these 2 args.
       final response = await Function.apply(result.handler, [
         request,
         result.pathParams,
@@ -122,9 +162,17 @@ class AstraApp {
       if (response is Response) return response;
       return Response.ok(response.toString());
     } on AstraHttpException catch (e) {
-      return Response(e.statusCode, body: e.body ?? e.message);
-    } catch (e) {
-      return Response.internalServerError(body: 'Internal Error: $e');
+      final bodyStr = e.body != null ? jsonEncode(e.body) : e.message;
+      return Response(
+        e.statusCode,
+        body: bodyStr,
+        headers: {
+          'content-type': e.body != null ? 'application/json' : 'text/plain',
+        },
+      );
+    } catch (e, st) {
+      print('INTERNAL ERROR: $e\n$st');
+      return Response.internalServerError(body: 'Internal Server Error: $e');
     }
   }
 

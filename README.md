@@ -1,45 +1,49 @@
 # Astra 🚀
 
-Astra 是一个受 **FastAPI** 启发的现代 Dart Web 框架。
-它利用 Dart 的 **AOT 编译**性能和强类型系统，提供极佳的开发者体验 (DX)。
+![Status](https://img.shields.io/badge/Status-Stable-brightgreen)
 
-[English Documentation](README_EN.md)
+> 🎉 **1.0.0 Stable Release is here!** Supports AOT native compilation and is completely database-agnostic.
 
-## ✨ 核心特性
+Astra is a modern Dart Web framework inspired by **FastAPI**.
+It leverages Dart's **AOT compilation** performance and strong type system to provide excellent Developer Experience (DX).
 
-- **直观的路由定义**：使用 `@Get`, `@Post` 等注解定义路由，类似 FastAPI/NestJS。
-- **依赖注入 (DI)**：内置强大的 DI 容器，支持单例和请求级作用域，自动注入 Controller 构造函数依赖。
-- **类型安全参数**：自动解析并转换 `@Path`, `@Query`, `@Body` 参数。
-- **智能返回值**：直接返回 DTO 对象或 `Future<T>`，框架自动处理 JSON 序列化。
-- **自动文档 (OpenAPI)**：开箱即用的 Swagger/OpenAPI 支持，访问 `/docs` 即可查看漂亮的 API 文档 (基于 Redoc)。
-- **零运行时反射**：使用 `build_runner` 在编译时生成代码，完美支持 Dart AOT 和 Native 部署。
-- **中间件支持**：兼容标准 `shelf` 中间件 ecosystem。
+[中文文档](README_ZH.md)
 
-## 📦 安装
+## ✨ Core Features
 
-在 `pubspec.yaml` 中添加依赖：
+- **Intuitive Routing**: Define routes using annotations like `@Get`, `@Post`, similar to FastAPI/NestJS.
+- **Dependency Injection (DI)**: Built-in powerful DI container supporting Singleton and Request-scoped patterns, automatically injecting Controller constructor dependencies.
+- **Type-Safe Parameters**: Automatically parses and converts `@Path`, `@Query`, `@Body` parameters.
+- **Smart Return Values**: Return DTO objects or `Future<T>` directly; the framework handles JSON serialization automatically.
+- **Auto Documentation (OpenAPI)**: Out-of-the-box Swagger/OpenAPI support. Visit `/docs` to view beautiful API documentation (based on Redoc).
+- **Zero Runtime Reflection**: Uses `build_runner` to generate code at compile time, fully supporting Dart AOT and Native deployment.
+- **Middleware Support**: Compatible with the standard `shelf` middleware ecosystem.
+
+## 📦 Installation
+
+Add dependencies to `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  astra: ^0.1.0
+  astra_dart: ^1.0.0
   shelf: ^1.4.0
 
 dev_dependencies:
   build_runner: ^2.4.0
-  # 其他生成器依赖...
+  # other generator dependencies...
 ```
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 1. 定义 Controller (`lib/src/user_controller.dart`)
+### 1. Define Controller (`lib/src/user_controller.dart`)
 
 ```dart
-import 'package:astra/astra.dart';
+import 'package:astra_dart/astra.dart';
 import 'package:shelf/shelf.dart';
 
-part 'user_controller.g.dart'; // 引用生成的文件
+part 'user_controller.g.dart'; // Reference generated file
 
-// 定义 DTO
+// Define DTO
 class UserDto {
   final String name;
   final String email;
@@ -55,7 +59,7 @@ class UserDto {
 @Controller('/users')
 class UserController {
   
-  // 依赖注入 (假设 UserService 已注册)
+  // Dependency Injection (Assuming UserService is registered)
   final UserService userService;
   UserController(this.userService);
 
@@ -71,53 +75,71 @@ class UserController {
 }
 ```
 
-### 2. 运行代码生成
+### 2. Run Code Generation
 
-在终端运行：
+Run in terminal:
 
 ```bash
 dart run build_runner build
 ```
 
-这将生成 `user_controller.g.dart`，其中包含路由注册和依赖注入的工厂代码。
+This will generate `user_controller.g.dart`, containing route registration and DI factory code.
 
-### 3. 创建应用入口 (`bin/main.dart`)
+### 3. Create App Entry (`bin/main.dart`)
 
 ```dart
-import 'package:astra/astra.dart';
+import 'package:astra_dart/astra.dart';
 import 'package:your_project/src/user_controller.dart'; 
 
 void main() async {
-  // 1. 初始化 App 和依赖
+  // 1. Initialize App and Dependencies
   final app = AstraApp(
     providers: [
-      UserService(), // 注册服务
+      UserService(), // Register service
     ],
   );
 
-  // 2. 注册 Controller (使用生成的辅助函数)
+  // 2. Register Controller (Use generated helper function)
   registerUserController(app);
 
-  // 3. 启动服务器
+  // 3. Start Server
   await app.listen(8080);
 }
 ```
 
-## 📚 API 文档
+## �️ Development & Deployment
 
-启动服务后，访问：
-- **API 文档 UI**: `http://localhost:8080/docs`
+### 1. Start Development Server (Hot Reload)
+No need to restart manually. Use the `dev` command to watch for file changes:
+```bash
+dart bin/astra.dart dev -t example/server.dart
+```
+
+### 2. Native Deployment (AOT Compilation)
+Astra uses **zero runtime reflection**, which makes it perfectly compatible with the Dart AOT compiler. You can compile it into a standalone binary with sub-millisecond startup times and an ultra-low memory footprint, which is highly suitable for cloud-native/Docker deployments:
+
+```bash
+# Automatically discard redundant code through Tree-shaking
+dart compile exe bin/main.dart -o build/server
+./build/server
+```
+
+> 💡 **About Databases**: As a core framework, Astra 1.0.0 **is not tightly coupled with any specific ORM or database**. You are free to assemble it with Drift, Prisma, or any native drivers.
+
+## �📚 API Documentation
+
+After starting the service, visit:
+- **API Docs UI**: `http://localhost:8080/docs`
 - **OpenAPI JSON**: `http://localhost:8080/openapi.json`
 
-## 🛠️ 异常处理
+## 🛠️ Exception Handling
 
-直接抛出异常，框架会自动转换为对应的 HTTP 响应：
+Throw exceptions directly, and the framework automatically converts them to corresponding HTTP responses:
 
 ```dart
 @Get('/error')
 void testError() {
-  throw BadRequestException('Invalid input'); // 返回 400
-  // 或者 throw NotFoundException('User not found'); // 返回 404
+  throw BadRequestException('Invalid input'); // Returns 400
+  // Or throw NotFoundException('User not found'); // Returns 404
 }
 ```
-

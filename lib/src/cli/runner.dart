@@ -1,5 +1,8 @@
 import 'package:args/command_runner.dart';
-import 'package:astra/src/cli/commands/dev.dart';
+import 'package:astra_dart/src/cli/commands/dev.dart';
+import 'package:astra_dart/src/cli/commands/create.dart';
+import 'package:astra_dart/src/cli/commands/make.dart';
+import 'package:astra_dart/src/cli/commands/build.dart';
 import 'package:mason_logger/mason_logger.dart';
 
 class AstraRunner extends CommandRunner<void> {
@@ -7,6 +10,9 @@ class AstraRunner extends CommandRunner<void> {
 
   AstraRunner() : super('astra', 'Astra Framework CLI Tool') {
     addCommand(DevCommand());
+    addCommand(CreateCommand());
+    addCommand(MakeCommand());
+    addCommand(BuildCommand());
   }
 
   @override

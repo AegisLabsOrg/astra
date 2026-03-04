@@ -1,4 +1,4 @@
-import 'package:astra/src/openapi/models.dart';
+import 'package:astra_dart/src/openapi/models.dart';
 
 class OpenApiRegistry {
   final Map<String, Map<String, OpenApiOperation>> _paths = {};

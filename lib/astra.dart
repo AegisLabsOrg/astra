@@ -1,7 +1,7 @@
 /// Astra Framework
 ///
 /// A modern, type-safe web framework for Dart inspired by FastAPI.
-library astra;
+library;
 
 // Core
 export 'src/core/application.dart';
@@ -29,9 +29,3 @@ export 'package:shelf/shelf.dart' show Request, Response, Handler;
 // DI
 export 'src/di/container.dart';
 
-// HTTP
-// export 'src/http/response.dart';
-
-// Macros (Annotations)
-// export 'src/macros/controller.dart';
-// export 'src/macros/http_methods.dart';

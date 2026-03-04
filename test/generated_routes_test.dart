@@ -1,8 +1,8 @@
 import 'dart:io';
-import 'package:astra/astra.dart';
-import 'package:astra/src/sample_controller.dart';
+import 'package:astra_dart/astra.dart';
+import 'fixtures/sample_controller.dart';
 import 'package:test/test.dart';
-import 'package:shelf/shelf.dart'; // Add this import
+// Add this import
 import 'package:http/http.dart' as http;
 
 void main() {
@@ -107,10 +107,7 @@ void main() {
       final response = await http.get(Uri.parse('http://localhost:$port/docs'));
       expect(response.statusCode, 200);
       expect(response.headers['content-type'], contains('text/html'));
-      expect(
-        response.body,
-        contains('<redoc spec-url=\'/openapi.json\'></redoc>'),
-      );
+      expect(response.body, contains('<div id="swagger-ui"></div>'));
     });
 
     test('GET /users/me returns 401 without token', () async {

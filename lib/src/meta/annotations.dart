@@ -6,32 +6,32 @@ abstract class HttpMethodAnnotation {
 
 /// Annotation for HTTP GET requests
 class Get extends HttpMethodAnnotation {
-  const Get(String path) : super(path);
+  const Get(super.path);
 }
 
 /// Annotation for HTTP POST requests
 class Post extends HttpMethodAnnotation {
-  const Post(String path) : super(path);
+  const Post(super.path);
 }
 
 /// Annotation for HTTP PUT requests
 class Put extends HttpMethodAnnotation {
-  const Put(String path) : super(path);
+  const Put(super.path);
 }
 
 /// Annotation for HTTP DELETE requests
 class Delete extends HttpMethodAnnotation {
-  const Delete(String path) : super(path);
+  const Delete(super.path);
 }
 
 /// Annotation for HTTP PATCH requests
 class Patch extends HttpMethodAnnotation {
-  const Patch(String path) : super(path);
+  const Patch(super.path);
 }
 
 /// Annotation for WebSocket routes
 class WebSocketRoute extends HttpMethodAnnotation {
-  const WebSocketRoute(String path) : super(path);
+  const WebSocketRoute(super.path);
 }
 
 /// Annotation for Controllers

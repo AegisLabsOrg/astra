@@ -26,8 +26,9 @@ class TrieRouter {
   void register(HttpMethod method, String path, Function handler) {
     // Normalize path: ensure start with / and remove trailing /
     if (!path.startsWith('/')) path = '/$path';
-    if (path.length > 1 && path.endsWith('/'))
+    if (path.length > 1 && path.endsWith('/')) {
       path = path.substring(0, path.length - 1);
+    }
 
     final segments = path.split('/').where((s) => s.isNotEmpty).toList();
     var current = _root;
@@ -64,8 +65,9 @@ class TrieRouter {
   RouteResult? lookup(HttpMethod method, String path) {
     // Normalize path
     if (!path.startsWith('/')) path = '/$path';
-    if (path.length > 1 && path.endsWith('/'))
+    if (path.length > 1 && path.endsWith('/')) {
       path = path.substring(0, path.length - 1);
+    }
 
     final segments = path.split('/').where((s) => s.isNotEmpty).toList();
     var current = _root;

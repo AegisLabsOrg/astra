@@ -33,3 +33,21 @@ class NotFoundException extends AstraHttpException {
   NotFoundException(String message, {dynamic body})
     : super(404, message, body: body);
 }
+
+/// 422 Unprocessable Entity (Validation Error)
+class ValidationException extends AstraHttpException {
+  ValidationException(String field, String message)
+    : super(
+        422,
+        'Validation Error',
+        body: {
+          'detail': [
+            {
+              'loc': ['body', field],
+              'msg': message,
+              'type': 'value_error',
+            },
+          ],
+        },
+      );
+}

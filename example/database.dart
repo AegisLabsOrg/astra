@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:drift/drift.dart';
+
 import 'package:drift_postgres/drift_postgres.dart';
 import 'package:postgres/postgres.dart';
 
@@ -25,10 +27,11 @@ class AppDatabase extends _$AppDatabase {
 QueryExecutor _openConnection() {
   return PgDatabase(
     endpoint: Endpoint(
-      host: 'localhost',
-      database: 'astra_todo',
-      username: 'postgres',
-      password: 'password',
+      host: Platform.environment['DB_HOST'] ?? 'localhost',
+      port: int.parse(Platform.environment['DB_PORT'] ?? '5432'),
+      database: Platform.environment['DB_NAME'] ?? 'astra_todo',
+      username: Platform.environment['DB_USER'] ?? 'postgres',
+      password: Platform.environment['DB_PASS'] ?? 'password',
     ),
     settings: const ConnectionSettings(sslMode: SslMode.disable),
   );
